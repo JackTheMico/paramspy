@@ -1,2 +1,13 @@
-from .checker import Checker, CheckFailed, RuleNotMatch
-__all__ = ["Checker", "CheckFailed", "RuleNotMatch"]
+from .checker import (
+    Checker,
+    CheckFailed,
+    RuleNotMatch,
+    TypeNotMatch,
+    ParamNotFound
+)
+__all__ = [
+    "Checker",
+    "CheckFailed",
+    "RuleNotMatch",
+    "TypeNotMatch",
+    "ParamNotFound"]

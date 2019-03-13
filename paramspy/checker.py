@@ -79,6 +79,11 @@ class RuleNotMatch(Exception):
     def __init__(self, message):
         super(RuleNotMatch, self).__init__(message)
 
+class TypeNotMatch(Exception):
+    """
+    class TypeNotMatch for type not match
+    """
+
 
 class ParamNotAllow(Exception):
     """
@@ -87,6 +92,15 @@ class ParamNotAllow(Exception):
 
     def __init__(self, message):
         super(ParamNotAllow, self).__init__(message)
+
+class ParamNotFound(Exception):
+    """
+    raising when some values which are not Founded by the rules
+    """
+
+    def __init__(self, message):
+        super(ParamNotFound, self).__init__(message)
+
 
 class RuleNotFound(Exception):
     """
@@ -117,11 +131,20 @@ class Checker(object):
         for index, rule in enumerate(rules):
             if isinstance(rule ,list):
                 self._rule_dict[rule[0]] = rule[1:]
+            elif isinstance(rule, tuple):
+                if len(rule) == 1:
+                    self._rule_dict[rule[0]] = tuple()
+                elif len(rule) < 1:
+                    raise TypeError(
+                        'rule cannot be a empty tuple'
+                    )
+                else:
+                    self._rule_dict[rule[0]] = rule[1:]
             elif isinstance(rule, str):
                 self._rule_dict[rule] = None
             else:
                 raise TypeError(
-                    'rule {} must be a str or a list'.format(index)
+                    'rule {} must be a str or a list or a tuple'.format(index)
                 )
 
     @typeassert(data=[list, dict])
@@ -129,72 +152,126 @@ class Checker(object):
         exc_list = []
         if isinstance(data, dict):
             data = [data]
-        for each in data:
-            self.__check(exc_list, each)
+        for index, each in enumerate(data):
+            self.__check(index, exc_list, each)
         if len(exc_list) > 0:
             raise CheckFailed(exc_list)
         if len(data) == 1:
             return data[0]
         return data
 
-    @typeassert(exclist=list, target=dict)
-    def __check(self, exclist, target):
+    @typeassert(index=int, exclist=list, target=dict)
+    def __check(self, index, exclist, target):
         for key, val in target.items():
             if key not in self._rule_dict.keys():
                 exclist.append(ParamNotAllow(
-                    'parameter: {} not allowed, value: {}'.format(key, val)
+                    'index: {}, parameter: {} not allowed, value: {}'.format(
+                        index, key, val)
                 ))
                 continue
             elif key in self._rule_dict.keys():
-                rule_val = self._rule_dict[key]
-                if not rule_val:
+                rules = self._rule_dict[key]
+                if isinstance(rules, tuple):
+                    self.__rules_check_not_None(index, exclist, key, val, rules)
+                elif isinstance(rules, list):
+                    if not val:
+                        val = rules[0]
+                        continue
+                    if len(rules) == 3:
+                        self.__type_check(index, exclist, key, val, rules[-2])
+                        self.__rule_check(index, exclist, key, val, rules[-1])
+                    elif len(rules) == 2:
+                        if isinstance(rules[-1], str) \
+                           or isinstance(rules[-1], self.re_type) \
+                           or isinstance(rules[-1], list):
+                            self.__rule_check(index, exclist, key, val, rules[-1])
+                        elif isinstance(rules[-1], tuple):
+                            self.__type_check(index, exclist, key, val, rules[-1])
+                    else:
+                        pass # no need to check type or rules
+                elif isinstance(rules, None):
                     continue
-                if not val:
-                    val = rule_val[0]
-                elif val and len(rule_val) > 1:
-                    rule = rule_val[-1]
-                    if isinstance(rule, self.re_type):
-                        judge = rule.match(val)
-                        if judge:
-                            continue
-                        exclist.append(RuleNotMatch(
-                            'parameter: {}, value: {} not match its rule: {}'.format(
-                                key, val, rule.pattern)
-                        ))
-                    elif isinstance(rule, str):
-                        if rule not in self.default_rules.keys():
-                            exclist.append(RuleNotFound(
-                                "not found parameter: {}'s rule: {}".format(key, rule)
-                            ))
-                            continue
-                        try:
-                            judge = self.default_rules[rule].match(val)
-                        except TypeError:
-                            pre_type = type(val)
-                            judge = self.default_rules[rule].match(str(val))
-                            val = pre_type(val)
-                        if judge:
-                            continue
-                        exclist.append(RuleNotMatch(
-                            'parameter: {}, value: {} not match its rule: {}'.format(
-                                key, val, self.default_rules[rule].pattern)
-                        ))
-                    elif isinstance(rule, list) or isinstance(rule, tuple):
-                        if val in rule:
-                            continue
-                        exclist.append(RuleNotMatch(
-                            'parameter: {}, value: {} not match its rule: {}'.format(
-                                key, val, rule)
-                        ))
+
         for rule_key, rule_val in self._rule_dict.items():
-            if rule_key not in target.keys():
-                if rule_val and len(rule_val) > 0:
-                    target[rule_key] = rule_val[0]
+            if rule_key not in target.keys() and isinstance(rule_val, tuple):
+                exclist.append(ParamNotFound(
+                    'index {} rule define parameter {} not found'.format(index, rule_key)))
+            elif rule_key not in target.keys() and isinstance(rule_val, list):
+                target[rule_key] = rule_val[0]
+
+    def __rules_check_not_None(self, index, exclist, key, val, rules):
+        if len(rules) == 2:
+            self.__type_check(index, exclist, key, val, rules[0])
+            self.__rule_check(index, exclist, key, val, rules[-1])
+        elif len(rules) == 1:
+            if isinstance(rules[0], str) or isinstance(rules[0], self.re_type):
+                self.__rule_check(index, exclist, key, val, rules[0])
+            else:
+                self.__type_check(index, exclist, key, val, rules[0])
+        else:
+            exclist.append(RuleNotFound(
+                'index {}, parameter {}, value {} not found rule, \n \
+                if don\'t need rule, please use str type'
+            ))
+
+
+    def __type_check(self, index, exclist, key, val, type_rules):
+        if isinstance(type_rules, list) or isinstance(type_rules, tuple):
+            if type(val) not in type_rules:
+                exclist.append(TypeNotMatch(
+                    'index: {}, parameter: {} type {}, value {} not type {}'.format(
+                        index, key, type(val), val, type_rules)
+                ))
+        else:
+            if not isinstance(val, type_rules):
+                exclist.append(TypeNotMatch(
+                    'index: {}, parameter: {} type {}, value {} not type {}'.format(
+                        index, key, type(val), val, type_rules)
+                ))
+
+    def __rule_check(self, index, exclist, key, val, match_rule):
+        if isinstance(match_rule, str):
+            if match_rule not in self.default_rules.keys():
+                exclist.append(RuleNotFound(
+                    "index: {}, not found parameter: {}'s rule: {}".format(key, rule)
+                ))
+                return
+            default_re = self.default_rules[match_rule]
+            try:
+                judge = default_re.match(val)
+            except TypeError:
+                pre_type = type(val)
+                judge = default_re.match(str(val))
+                val = pre_type(val)
+            if not judge:
+                exclist.append(RuleNotMatch(
+                    'index: {}, parameter: {}, value: {} not match its rule: {}'.format(
+                        index, key, val, default_re.pattern)
+                ))
+        elif isinstance(match_rule, self.re_type):
+            try:
+                judge = match_rule.match(val)
+            except TypeError:
+                pre_type = type(val)
+                judge = match_rule.match(str(val))
+                val = pre_type(val)
+            if not judge:
+                exclist.append(RuleNotMatch(
+                    'index: {}, parameter: {}, value: {} not match its rule: {}'.format(
+                        index, key, val, match_rule.pattern)
+                ))
+        elif isinstance(match_rule, list) or isinstance(match_rule, tuple):
+            if val not in match_rule:
+                exclist.append(RuleNotMatch(
+                    'index {}, parameter: {}, value: {} not match its rule: {}'.format(
+                        index, key, val, match_rule)
+                ))
 
 
 class ObjChecker(object):
     """
-    Checker for Object
+    Checker for Object attributes
+    not finished yet, still working on this one
     """
 
     @typeassert(rules=dict)
@@ -215,5 +292,5 @@ class ObjChecker(object):
          data --
         :return: checked and maybe modified data
         """
-
+        pass
 
