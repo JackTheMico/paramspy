@@ -115,7 +115,7 @@ class Checker(object):
     class Checker for check parameters
     """
 
-    default_rules = {
+    _default_rules = {
         "NUMBER": re.compile(r'^[-+]?[0-9]+$'),
         "WORD": re.compile(r'[a-zA-Z-_\d]+'),
         "EMAIL": re.compile(r'^[a-z_0-9.-]{1,64}@([a-z0-9-]{1,200}.){1,5}[a-z]{1,6}$')
@@ -160,6 +160,11 @@ class Checker(object):
             return data[0]
         return data
 
+    @classmethod
+    def default_rules(cls):
+        from pprint import pprint
+        return pprint(cls._default_rules)
+
     @typeassert(index=int, exclist=list, target=dict)
     def __check(self, index, exclist, target):
         for key, val in target.items():
@@ -189,7 +194,7 @@ class Checker(object):
                             self.__type_check(index, exclist, key, val, rules[-1])
                     else:
                         pass # no need to check type or rules
-                elif isinstance(rules, None):
+                elif isinstance(rules, type(None)):
                     continue
 
         for rule_key, rule_val in self._rule_dict.items():
@@ -211,7 +216,8 @@ class Checker(object):
         else:
             exclist.append(RuleNotFound(
                 'index {}, parameter {}, value {} not found rule, \n \
-                if don\'t need rule, please use str type'
+                if don\'t need rule, please use str type'.format(
+                        index, key, val)
             ))
 
 
@@ -231,12 +237,12 @@ class Checker(object):
 
     def __rule_check(self, index, exclist, key, val, match_rule):
         if isinstance(match_rule, str):
-            if match_rule not in self.default_rules.keys():
+            if match_rule not in self._default_rules.keys():
                 exclist.append(RuleNotFound(
                     "index: {}, not found parameter: {}'s rule: {}".format(key, rule)
                 ))
                 return
-            default_re = self.default_rules[match_rule]
+            default_re = self._default_rules[match_rule]
             try:
                 judge = default_re.match(val)
             except TypeError:

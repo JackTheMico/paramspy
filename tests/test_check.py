@@ -43,15 +43,22 @@ from paramspy import (
 
 
 def test_not_match():
-    target = {
-        "username": "dlwxxxdlw",
-        "password": "zxvxcgweg",
-        "phone": "1234567890%$^",
-    }
+    target = [
+        {
+            "username": "dlwxxxdlw",
+            "password": "zxvxcgweg",
+            "phone": "1234567890%$^",
+        },
+        {
+            "username": "",
+            "password": "zxvxcgweg",
+            "phone": "1234567890%$^",
+        },
+    ]
 
     try:
         res = Checker([
-            ["username", None, "WORD"],
+            ("username", str, "WORD"),
             ["password", None, "WORD"],
             ("phone", int, "NUMBER"),
             ["gender", "female"]
@@ -60,6 +67,7 @@ def test_not_match():
         assert isinstance(check_err.args[0][0], TypeNotMatch)
         assert isinstance(check_err.args[0][1], RuleNotMatch)
         logger.error("{}".format(check_err))
+        logger.warning("default rules {}".format(Checker.default_rules()))
 
     try:
         res = Checker([
@@ -262,6 +270,42 @@ def test_list_data():
             ("phone", int, "NUMBER"),
             ["gender", "secret"],
             ("email", str, "EMAIL")
+        ]).check(target)
+        logger.debug("{}".format(res))
+    except CheckFailed as check_err:
+        logger.error("{}".format(check_err))
+
+
+def test_no_rule():
+    target = [
+        {
+            "username": "dlwxxxdlw",
+            "password": "zxvxcgweg",
+            "phone": "1234567890",
+            "gender": "female",
+            "email": "heheeheheda@gmail.com"
+        },
+        {
+            "username": "dlwxxxdlw",
+            "phone": 1234567890,
+            "gender": "female",
+            "email": "heheeheheda@gmail.com"
+        },
+        {
+            "username": 123456,
+            "password": "zxvxcgweg",
+            "phone": "1234567890",
+            "email": "bademail"
+        },
+    ]
+
+    try:
+        res = Checker([
+            "username",
+            "password",
+            "phone",
+            "gender",
+            "email",
         ]).check(target)
         logger.debug("{}".format(res))
     except CheckFailed as check_err:
