@@ -122,7 +122,6 @@ class Checker(object):
     }
 
 
-
     @typeassert(rules=list)
     def __init__(self, rules):
         ""
@@ -147,13 +146,15 @@ class Checker(object):
                     'rule {} must be a str or a list or a tuple'.format(index)
                 )
 
-    @typeassert(data=[list, dict])
-    def check(self, data):
+    @typeassert(data=[list, dict], raise_first=bool)
+    def check(self, data, raise_first=False):
         exc_list = []
         if isinstance(data, dict):
             data = [data]
         for index, each in enumerate(data):
             self.__check(index, exc_list, each)
+            if raise_first and len(exc_list) == 1:
+                break
         if len(exc_list) > 0:
             raise CheckFailed(exc_list)
         if len(data) == 1:
@@ -163,7 +164,8 @@ class Checker(object):
     @classmethod
     def default_rules(cls):
         from pprint import pprint
-        return pprint(cls._default_rules)
+        pprint(cls._default_rules)
+        return cls._default_rules
 
     @typeassert(index=int, exclist=list, target=dict)
     def __check(self, index, exclist, target):
@@ -182,19 +184,32 @@ class Checker(object):
                     if not val:
                         val = rules[0]
                         continue
-                    if len(rules) == 3:
-                        self.__type_check(index, exclist, key, val, rules[-2])
-                        self.__rule_check(index, exclist, key, val, rules[-1])
-                    elif len(rules) == 2:
-                        if isinstance(rules[-1], str) \
-                           or isinstance(rules[-1], self.re_type) \
-                           or isinstance(rules[-1], list):
-                            self.__rule_check(index, exclist, key, val, rules[-1])
-                        elif isinstance(rules[-1], tuple):
-                            self.__type_check(index, exclist, key, val, rules[-1])
-                    else:
-                        pass # no need to check type or rules
-                elif isinstance(rules, type(None)):
+                    # if len(rules) == 4:
+                    #     self.__type_check(index, exclist, key, val, rules[-3])
+                    #     self.__rule_check(index, exclist, key, val, rules[-2])
+                    #     self.__lambda_check(index, exclist, key, val, rules[-2])
+                    # elif len(rules) == 3:
+                    for rule in rules[1:]:
+                        if isinstance(rule, str) \
+                           or isinstance(rule, self.re_type) \
+                           or isinstance(rule, list):
+                            self.__rule_check(index, exclist, key, val, rule)
+                        elif isinstance(rule, tuple):
+                            self.__type_check(index, exclist, key, val, rule)
+                        elif isinstance(rule, type(lambda:None)):
+                            self.__lambda_check(index, exclist, key, val, rule)
+                    # elif len(rules) == 2:
+                    #     if isinstance(rule[-1], str) \
+                    #        or isinstance(rule[-1], self.re_type) \
+                    #        or isinstance(rule[-1], list):
+                    #         self.__rule_check(index, exclist, key, val, rule[-1])
+                    #     elif isinstance(rule[-1], tuple):
+                    #         self.__type_check(index, exclist, key, val, rule[-1])
+                    #     elif isinstance(rule[-1], type(lambda:None)):
+                    #         self.__lambda_check(index, exclist, key, val, rule[-1])
+                    # else:
+                    #     pass # no need to check type or rules
+                elif rules is None:
                     continue
 
         for rule_key, rule_val in self._rule_dict.items():
@@ -205,24 +220,32 @@ class Checker(object):
                 target[rule_key] = rule_val[0]
 
     def __rules_check_not_None(self, index, exclist, key, val, rules):
-        if len(rules) == 2:
-            self.__type_check(index, exclist, key, val, rules[0])
-            self.__rule_check(index, exclist, key, val, rules[-1])
-        elif len(rules) == 1:
-            if isinstance(rules[0], str) or isinstance(rules[0], self.re_type):
-                self.__rule_check(index, exclist, key, val, rules[0])
-            else:
-                self.__type_check(index, exclist, key, val, rules[0])
-        else:
+        if len(rules) == 0:
             exclist.append(RuleNotFound(
                 'index {}, parameter {}, value {} not found rule, \n \
                 if don\'t need rule, please use str type'.format(
                         index, key, val)
             ))
+            return
+        for rule in rules:
+            if isinstance(rule, str) \
+               or isinstance(rule, self.re_type) \
+               or isinstance(rule, list):
+                self.__rule_check(index, exclist, key, val, rule)
+            elif isinstance(rule, tuple):
+                self.__type_check(index, exclist, key, val, rule)
+            elif isinstance(rule, type(lambda:None)):
+                self.__lambda_check(index, exclist, key, val, rule)
 
+    def __lambda_check(self, index, exclist, key, val, lambda_rule):
+        if not lambda_rule(val):
+            exclist.append(RuleNotMatch(
+                'index {}, parameter: {}, value: {} not match its rule: {}'.format(
+                    index, key, val, lambda_rule)
+            ))
 
     def __type_check(self, index, exclist, key, val, type_rules):
-        if isinstance(type_rules, list) or isinstance(type_rules, tuple):
+        if isinstance(type_rules, tuple):
             if type(val) not in type_rules:
                 exclist.append(TypeNotMatch(
                     'index: {}, parameter: {} type {}, value {} not type {}'.format(
