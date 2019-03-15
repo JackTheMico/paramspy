@@ -21,7 +21,9 @@ import re
 
 try:
     from inspect import signature
+    from inspect import getsourcelines
 except ImportError:
+    from funcsigs import getsourcelines
     from funcsigs import signature
 from functools import wraps
 
@@ -227,11 +229,17 @@ class Checker(object):
             elif isinstance(rule, type(lambda:None)):
                 self.__lambda_check(index, exclist, key, val, rule)
 
+    def __get_funcstr(self, func):
+        funcstring = str(getsourcelines(func)[0])
+        func_str = funcstring.strip("['\\n']")
+        func_str = func_str[func_str.index("lambda"):]
+        return func_str
+
     def __lambda_check(self, index, exclist, key, val, lambda_rule):
         if not lambda_rule(val):
             exclist.append(RuleNotMatch(
                 'index {}, parameter: {}, value: {} not match its rule: {}'.format(
-                    index, key, val, lambda_rule)
+                    index, key, val, self.__get_funcstr(lambda_rule))
             ))
 
     def __type_check(self, index, exclist, key, val, type_rules):
