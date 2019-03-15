@@ -71,6 +71,12 @@ class CheckFailed(Exception):
     def __init__(self, message):
         super(CheckFailed, self).__init__(message)
 
+    def get_excstr(self):
+        res_str = ""
+        for err in self.args[0]:
+            res_str += "".join([err.__str__(), "\n"])
+        return res_str
+
 
 class RuleNotMatch(Exception):
     """
@@ -184,11 +190,6 @@ class Checker(object):
                     if not val:
                         val = rules[0]
                         continue
-                    # if len(rules) == 4:
-                    #     self.__type_check(index, exclist, key, val, rules[-3])
-                    #     self.__rule_check(index, exclist, key, val, rules[-2])
-                    #     self.__lambda_check(index, exclist, key, val, rules[-2])
-                    # elif len(rules) == 3:
                     for rule in rules[1:]:
                         if isinstance(rule, str) \
                            or isinstance(rule, self.re_type) \
@@ -198,17 +199,6 @@ class Checker(object):
                             self.__type_check(index, exclist, key, val, rule)
                         elif isinstance(rule, type(lambda:None)):
                             self.__lambda_check(index, exclist, key, val, rule)
-                    # elif len(rules) == 2:
-                    #     if isinstance(rule[-1], str) \
-                    #        or isinstance(rule[-1], self.re_type) \
-                    #        or isinstance(rule[-1], list):
-                    #         self.__rule_check(index, exclist, key, val, rule[-1])
-                    #     elif isinstance(rule[-1], tuple):
-                    #         self.__type_check(index, exclist, key, val, rule[-1])
-                    #     elif isinstance(rule[-1], type(lambda:None)):
-                    #         self.__lambda_check(index, exclist, key, val, rule[-1])
-                    # else:
-                    #     pass # no need to check type or rules
                 elif rules is None:
                     continue
 
@@ -300,7 +290,7 @@ class Checker(object):
 class ObjChecker(object):
     """
     Checker for Object attributes
-    not finished yet, still working on this one
+    TODO not finished yet, still working on this one
     """
 
     @typeassert(rules=dict)

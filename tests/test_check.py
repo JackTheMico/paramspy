@@ -182,13 +182,14 @@ def test_custom_regex():
         res = Checker([
             ["username", None, "WORD"],
             ["password", None, "WORD"],
-            ["phone", None, [int, str],re.compile('^(138|181)')],
+            ["phone", None, (int, str),re.compile('^(138|181)')],
             ["gender", "female"],
             ["email", None, "EMAIL"]
         ]).check(target)
         logger.debug(res)
     except CheckFailed as check_err:
         logger.error(check_err)
+        logger.error(check_err.get_excstr())
 
 def test_custom_list_rule():
     target = [
@@ -332,6 +333,7 @@ def test_for_lambda():
         ]).check(target)
     except CheckFailed as check_err:
         logger.error(check_err)
+        logger.error(check_err.get_excstr())
 
 
 def test_raise_first():
