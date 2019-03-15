@@ -13,6 +13,7 @@
     Version:          v1.0
 
     Lastmodified:     2019-03-07 by Jack Deng
+                      2019-03-15 by Jack Deng
 
 -------------------------------------------------
 """
@@ -91,6 +92,8 @@ class TypeNotMatch(Exception):
     """
     class TypeNotMatch for type not match
     """
+    def __init__(self, message):
+        super(TypeNotMatch, self).__init__(message)
 
 
 class ParamNotAllow(Exception):
