@@ -56,7 +56,6 @@ def test_not_match():
             "gender": "alian"
         },
         {
-            "username": "dlwxxxdlw",
             "password": "zxvxcgweg",
             "phone": "18934554354",
             "age": "35"
@@ -71,9 +70,9 @@ def test_not_match():
 
     try:
         res = Checker([
-            ("username", str, "WORD"),
-            ("password", str, "WORD"),
-            ("phone", int, "NUMBER"),
+            ("username", (str,), "WORD"),
+            ("password", (str,), "WORD"),
+            ("phone", (int,), "NUMBER"),
             ["gender", "female", ["female", "male", "secret"]],
             ["age", None, (int,), lambda x: int(x) > 18]
         ]).check(target)
@@ -247,9 +246,9 @@ def test_value_not_allowed():
 
     try:
         res = Checker([
-            ("username", str, "WORD"),
-            ("password", str, "WORD"),
-            ("phone", int, "NUMBER"),
+            ("username", (str,), "WORD"),
+            ("password", (str,), "WORD"),
+            ("phone", (str), "NUMBER"),
             ["email", None, "EMAIL"]
         ]).check(target)
         logger.debug("{}".format(res))

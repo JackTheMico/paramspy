@@ -21,7 +21,6 @@ target = [
         "gender": "alian"
     },
     {
-        "username": "dlwxxxdlw",
         "password": "zxvxcgweg",
         "phone": "18934554354",
         "age": "35"
@@ -35,9 +34,9 @@ target = [
 ]
 try:
     res = Checker([
-        ("username", str, "WORD"),
-        ("password", str, "WORD"),
-        ("phone", int, "NUMBER"),
+        ("username", (str,), "WORD"),
+        ("password", (str,), "WORD"),
+        ("phone", (int,), "NUMBER"),
         ["gender", "female", ["female", "male", "secret"]],
         ["age", None, (int,), lambda x: int(x) > 18]
     ]).check(target)
@@ -48,20 +47,32 @@ except CheckFailed as check_err:
 
 ### Result
 ```Python
-    [RuleNotMatch('index: 0, parameter: phone, value: 1234567890%$^ not match its rule: ^[-+]?[0-9]+$'), 
+[
+    TypeNotMatch("index: 0, parameter: phone type <class 'str'>, value 1234567890%$^ not in (<class 'int'>,) types"), 
+    RuleNotMatch('index: 0, parameter: phone, value: 1234567890%$^ not match its rule: ^[-+]?[0-9]+$'), 
     RuleNotMatch('index: 1, parameter: username, value:  not match its rule: [a-zA-Z-_\\d]+'), 
+    TypeNotMatch("index: 1, parameter: phone type <class 'str'>, value 1234567890%$^ not in (<class 'int'>,) types"), 
     RuleNotMatch('index: 1, parameter: phone, value: 1234567890%$^ not match its rule: ^[-+]?[0-9]+$'), 
     RuleNotMatch("index 1, parameter: gender, value: alian not match its rule: ['female', 'male', 'secret']"), 
-    TypeNotMatch("index: 2, parameter: age type <class 'str'>, value 35 not in (<class 'int'>,)") types, 
-    RuleNotMatch('index 3, parameter: age, value: 12 not match its rule: lambda x: int(x) > 18')]
+    TypeNotMatch("index: 2, parameter: phone type <class 'str'>, value 18934554354 not in (<class 'int'>,) types"), 
+    TypeNotMatch("index: 2, parameter: age type <class 'str'>, value 35 not in (<class 'int'>,) types"), 
+    ParamNotFound('index 2 rule define parameter username not found'), 
+    TypeNotMatch("index: 3, parameter: phone type <class 'str'>, value 18934554354 not in (<class 'int'>,) types"), 
+    RuleNotMatch('index 3, parameter: age, value: 12 not match its rule: lambda x: int(x) > 18')
+]
 
-    error string
-    index: 0, parameter: phone, value: 1234567890%$^ not match its rule: ^[-+]?[0-9]+$
-    index: 1, parameter: username, value:  not match its rule: [a-zA-Z-_\d]+
-    index: 1, parameter: phone, value: 1234567890%$^ not match its rule: ^[-+]?[0-9]+$
-    index 1, parameter: gender, value: alian not match its rule: ['female', 'male', 'secret']
-    index: 2, parameter: age type <class 'str'>, value 35 not in (<class 'int'>,) types
-    index 3, parameter: age, value: 12 not match its rule: lambda x: int(x) > 18
+error string
+index: 0, parameter: phone type <class 'str'>, value 1234567890%$^ not in (<class 'int'>,) types
+index: 0, parameter: phone, value: 1234567890%$^ not match its rule: ^[-+]?[0-9]+$
+index: 1, parameter: username, value:  not match its rule: [a-zA-Z-_\d]+
+index: 1, parameter: phone type <class 'str'>, value 1234567890%$^ not in (<class 'int'>,) types
+index: 1, parameter: phone, value: 1234567890%$^ not match its rule: ^[-+]?[0-9]+$
+index 1, parameter: gender, value: alian not match its rule: ['female', 'male', 'secret']
+index: 2, parameter: phone type <class 'str'>, value 18934554354 not in (<class 'int'>,) types
+index: 2, parameter: age type <class 'str'>, value 35 not in (<class 'int'>,) types
+index 2 rule define parameter username not found
+index: 3, parameter: phone type <class 'str'>, value 18934554354 not in (<class 'int'>,) types
+index 3, parameter: age, value: 12 not match its rule: lambda x: int(x) > 18
 ```
 
 ## Now, let me explain it for you
@@ -73,10 +84,10 @@ except CheckFailed as check_err:
          And this ["female", "male", "secret"] means value have to be in these three values,
          if gender's value is "alien", Checker will raise CheckFailed Exception.
 
-      2. tuple, example: ("phone", int, "NUMBER").
+      2. tuple, example: ("phone", (int,), "NUMBER").
          This means parameter "phone" must be in the target which you about to check,
          if not, raise CheckFailed Exception.
-         As for "int", it means type check, if a parameter is ok with multiple type, you
+         As for (int,), it means type check, if a parameter is ok with multiple type, you
          can write it like: (int ,str, dict).
          Last one is a default rule, there are three default rules, you can take a look by
          calling Checker.default_rules() or just take a look in checker.py.

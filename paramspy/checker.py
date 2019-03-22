@@ -246,18 +246,18 @@ class Checker(object):
             ))
 
     def __type_check(self, index, exclist, key, val, type_rules):
-        if isinstance(type_rules, tuple):
-            if type(val) not in type_rules:
-                exclist.append(TypeNotMatch(
-                    'index: {}, parameter: {} type {}, value {} not in {} types'.format(
-                        index, key, type(val), val, type_rules)
-                ))
-        else:
-            if not isinstance(val, type_rules):
-                exclist.append(TypeNotMatch(
-                    'index: {}, parameter: {} type {}, value {} not type {}'.format(
-                        index, key, type(val), val, type_rules)
-                ))
+        # if isinstance(type_rules, tuple):
+        if type(val) not in type_rules:
+            exclist.append(TypeNotMatch(
+                'index: {}, parameter: {} type {}, value {} not in {} types'.format(
+                    index, key, type(val), val, type_rules)
+            ))
+        # else:
+        #     if not isinstance(val, type_rules):
+        #         exclist.append(TypeNotMatch(
+        #             'index: {}, parameter: {} type {}, value {} not type {}'.format(
+        #                 index, key, type(val), val, type_rules)
+        #         ))
 
     def __rule_check(self, index, exclist, key, val, match_rule):
         if isinstance(match_rule, str):
