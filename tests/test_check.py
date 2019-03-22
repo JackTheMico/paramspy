@@ -53,21 +53,36 @@ def test_not_match():
             "username": "",
             "password": "zxvxcgweg",
             "phone": "1234567890%$^",
+            "gender": "alian"
+        },
+        {
+            "username": "dlwxxxdlw",
+            "password": "zxvxcgweg",
+            "phone": "18934554354",
+            "age": "35"
+        },
+        {
+            "username": "dlwxxxdlw",
+            "password": "zxvxcgweg",
+            "phone": "18934554354",
+            "age": 12
         },
     ]
 
     try:
         res = Checker([
             ("username", str, "WORD"),
-            ["password", None, "WORD"],
+            ("password", str, "WORD"),
             ("phone", int, "NUMBER"),
-            ["gender", "female"]
+            ["gender", "female", ["female", "male", "secret"]],
+            ["age", None, (int,), lambda x: int(x) > 18]
         ]).check(target)
     except CheckFailed as check_err:
         # assert isinstance(check_err.args[0][0], TypeNotMatch)
         # assert isinstance(check_err.args[0][1], RuleNotMatch)
         logger.error("{}".format(check_err))
-        logger.warning("default rules {}".format(Checker.default_rules()))
+        logger.error("error string \n{}".format(check_err.get_excstr()))
+        # logger.warning("default rules {}".format(Checker.default_rules()))
 
     try:
         res = Checker([
