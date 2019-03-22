@@ -97,10 +97,14 @@ except CheckFailed as check_err:
 ``` 
 
 ### So, that's basicially all of it.
-### Oh, One last thing, the Checker can check something like [{}, {}, {}] or a single dict object.
-### I'm still considering if there is need or not to make a Object Checker.
+    Oh, One last thing, the Checker can check something like [{}, {}, {}] or a single dict object.
+    I'm still considering if there's a need or not to make a Object Checker.
 
 #### By the way, if you found out that this README has many grammatical mistakes, 
-#### that's because I'm a Chinese Programmer, I have few chance to communicate someone with English, but
-#### I'm a big fan of "Big Bang Theory" and "Rich and Morty" and extra.
+    that's because I'm a Chinese Programmer, I have few chance to communicate someone with English, but
+    I'm a big fan of "Big Bang Theory" and "Rich and Morty" and extra.
+
+### If you need some help or find a problem, feel free to open an Issue, I'll responses to you ASAP.
+### If you make some improvements, I'm happy to see a PR.
+
 ## Thank you for you reading.
