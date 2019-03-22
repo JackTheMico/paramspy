@@ -72,6 +72,7 @@ except CheckFailed as check_err:
          , in this case is "female".
          And this ["female", "male", "secret"] means value have to be in these three values,
          if gender's value is "alien", Checker will raise CheckFailed Exception.
+
       2. tuple, example: ("phone", int, "NUMBER").
          This means parameter "phone" must be in the target which you about to check,
          if not, raise CheckFailed Exception.
@@ -102,4 +103,4 @@ except CheckFailed as check_err:
 #### By the way, if you found out that this README has many grammatical mistakes, 
 #### that's because I'm a Chinese Programmer, I have few chance to communicate someone with English, but
 #### I'm a big fan of "The Big Bang Theory" and "Rich and Morty" and extra.
-### Thank you for you reading.
+## Thank you for you reading.
