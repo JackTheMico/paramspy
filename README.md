@@ -92,11 +92,11 @@ index 3, parameter: age, value: 12 not match its rule: lambda x: int(x) > 18
          Last one is a default rule, there are three default rules, you can take a look by
          calling Checker.default_rules() or just take a look in checker.py.
          
-      3. You may already noticed, yes you can write lambda to implement some custom check logic.
-         Also, Regular Expression is supported, for example:
-          ["phone", None, (int, str), re.compile('^(138|181)')],
-         Checker will use '^(138|181)' as pattern and re.match method to check the "phone"
-         parameter's value.
+     You may already noticed, yes you can write lambda to implement some custom check logic.
+     Also, Regular Expression is supported, for example:
+     ["phone", None, (int, str), re.compile('^(138|181)')],
+     Checker will use '^(138|181)' as pattern and re.match method to check the "phone"
+     parameter's value.
 
 ### Default Rules for now:
 ```Python
