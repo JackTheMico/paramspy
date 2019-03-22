@@ -102,5 +102,5 @@ except CheckFailed as check_err:
 
 #### By the way, if you found out that this README has many grammatical mistakes, 
 #### that's because I'm a Chinese Programmer, I have few chance to communicate someone with English, but
-#### I'm a big fan of "The Big Bang Theory" and "Rich and Morty" and extra.
+#### I'm a big fan of "Big Bang Theory" and "Rich and Morty" and extra.
 ## Thank you for you reading.
