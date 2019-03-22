@@ -52,7 +52,7 @@ except CheckFailed as check_err:
     RuleNotMatch('index: 1, parameter: username, value:  not match its rule: [a-zA-Z-_\\d]+'), 
     RuleNotMatch('index: 1, parameter: phone, value: 1234567890%$^ not match its rule: ^[-+]?[0-9]+$'), 
     RuleNotMatch("index 1, parameter: gender, value: alian not match its rule: ['female', 'male', 'secret']"), 
-    TypeNotMatch("index: 2, parameter: age type <class 'str'>, value 35 not type (<class 'int'>,)"), 
+    TypeNotMatch("index: 2, parameter: age type <class 'str'>, value 35 not in (<class 'int'>,)") types, 
     RuleNotMatch('index 3, parameter: age, value: 12 not match its rule: lambda x: int(x) > 18')]
 
     error string
@@ -60,7 +60,7 @@ except CheckFailed as check_err:
     index: 1, parameter: username, value:  not match its rule: [a-zA-Z-_\d]+
     index: 1, parameter: phone, value: 1234567890%$^ not match its rule: ^[-+]?[0-9]+$
     index 1, parameter: gender, value: alian not match its rule: ['female', 'male', 'secret']
-    index: 2, parameter: age type <class 'str'>, value 35 not type (<class 'int'>,)
+    index: 2, parameter: age type <class 'str'>, value 35 not in (<class 'int'>,) types
     index 3, parameter: age, value: 12 not match its rule: lambda x: int(x) > 18
 ```
 

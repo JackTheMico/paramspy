@@ -249,7 +249,7 @@ class Checker(object):
         if isinstance(type_rules, tuple):
             if type(val) not in type_rules:
                 exclist.append(TypeNotMatch(
-                    'index: {}, parameter: {} type {}, value {} not type {}'.format(
+                    'index: {}, parameter: {} type {}, value {} not in {} types'.format(
                         index, key, type(val), val, type_rules)
                 ))
         else:
