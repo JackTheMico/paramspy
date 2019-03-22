@@ -63,40 +63,40 @@ except CheckFailed as check_err:
     index: 2, parameter: age type <class 'str'>, value 35 not type (<class 'int'>,)
     index 3, parameter: age, value: 12 not match its rule: lambda x: int(x) > 18
 ```
-    In a word, the rules above will check if "username", "password", "phone", "gender" in 
-    target; and "username", "password" must be str type, also have to obey default rule: "WORD".
 
-    As for "phone", it must be an int type and obey default rule: "NUMBER".
+## Now, let me explain it for you
+    There are two types of rule:
+      1. List, example:  ["gender", "female", ["female", "male", "secret"]].
+         This means "gender" is a optional parameter, if the target you gonna check don't
+         have a "gender" parameter, Checker will help you add it with a default value 
+         , in this case is "female".
+         And this ["female", "male", "secret"] means value have to be in these three values,
+         if gender's value is "alien", Checker will raise CheckFailed Exception.
+      2. tuple, example: ("phone", int, "NUMBER").
+         This means parameter "phone" must be in the target which you about to check,
+         if not, raise CheckFailed Exception.
+         As for "int", it means type check, if a parameter is ok with multiple type, you
+         can write it like: (int ,str, dict).
+         Last one is a default rule, there are three default rules, you can take a look by
+         calling Checker.default_rules() or just take a look in checker.py.
+         
+         Default Rules:
+         ```Python
+         {
+             'EMAIL': re.compile('^[a-z_0-9.-]{1,64}@([a-z0-9-]{1,200}.){1,5}[a-z]{1,6}$'),
+             'NUMBER': re.compile('^[-+]?[0-9]+$'),
+             'WORD': re.compile('[a-zA-Z-_\\d]+')
+         }
+         ``` 
+      3. You may already noticed, yes you can write lambda to implement some custom check logic.
+         Also, Regular Expression is supported, for example:
+          ["phone", None, (int, str), re.compile('^(138|181)')],
+         Checker will use '^(138|181)' as pattern and re.match method to check the "phone"
+         parameter's value.
 
-    For "gender", it must in range ["female", "male", "secret"].
+### So, that's basicially all of it.
+    Oh, One last thing, the Checker can check something like [{}, {}, {}] or a single dict object.
+    I'm still considering if there is need or not to make a Object Checker.
 
-    If you look closely, you will notice "username", "password", "phone" rules are all in tuple type,
-    but "gender" rule is in a list. 
-
-    Well, this difference make gender optional, means if target don't have a parameter named "gender", 
-    Checker will add it for you with default value "female".
-
-    But for those rules in tuple type, if parameter not in target or parameter's value is empty, 
-    Checker will raise CheckFailed.
-
-### ("username", str, "WORD") 
-    This rule means target must have a parameter called "username" ,
-    and its value cannot be empty, and value' type must be str.
-
-    There are several default rules in Checker class, you can view it
-    by call Checker.default_rules(). You will get something like:
-```Python
-{'EMAIL': re.compile('^[a-z_0-9.-]{1,64}@([a-z0-9-]{1,200}.){1,5}[a-z]{1,6}$'),
- 'NUMBER': re.compile('^[-+]?[0-9]+$'),
- 'WORD': re.compile('[a-zA-Z-_\\d]+')}
-```
-    If you don't want any type assert or rules, you can just use "username" as a rule like:
-```Python
-rules = [
-    "username",
-    ("password", str, "WORD"],
-    ("phone", int, "NUMBER"),
-    ["gender", "female", ["female", "male", "secret"]]
-]
-```
-
+### By the way, if you found out thie README have many grammatical mistakes, that's because I'm a Chinese Programmer.
+### Thank you for you reading.

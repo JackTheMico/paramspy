@@ -82,7 +82,7 @@ def test_not_match():
         # assert isinstance(check_err.args[0][1], RuleNotMatch)
         logger.error("{}".format(check_err))
         logger.error("error string \n{}".format(check_err.get_excstr()))
-        # logger.warning("default rules {}".format(Checker.default_rules()))
+        logger.warning("default rules {}".format(Checker.default_rules()))
 
     try:
         res = Checker([
