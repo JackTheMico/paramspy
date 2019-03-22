@@ -97,7 +97,9 @@ except CheckFailed as check_err:
 
 ### So, that's basicially all of it.
 ### Oh, One last thing, the Checker can check something like [{}, {}, {}] or a single dict object.
-    I'm still considering if there is need or not to make a Object Checker.
+### I'm still considering if there is need or not to make a Object Checker.
 
-### By the way, if you found out thie README have many grammatical mistakes, that's because I'm a Chinese Programmer.
+#### By the way, if you found out that this README has many grammatical mistakes, 
+#### that's because I'm a Chinese Programmer, I have few chance to communicate someone with English, but
+#### I'm a big fan of "The Big Bang Theory" and "Rich and Morty" and extra.
 ### Thank you for you reading.
