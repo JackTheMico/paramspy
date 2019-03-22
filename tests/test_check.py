@@ -18,7 +18,6 @@
 """
 
 import re
-import pytest
 try:
     from loguru import logger
 except ImportError:
@@ -30,7 +29,6 @@ from paramspy import (
     CheckFailed,
     RuleNotMatch,
     TypeNotMatch,
-    ParamNotFound
 )
 
 # tuple means no dafault value, the value must come from input data

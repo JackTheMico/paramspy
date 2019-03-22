@@ -232,6 +232,7 @@ class Checker(object):
             elif isinstance(rule, type(lambda:None)):
                 self.__lambda_check(index, exclist, key, val, rule)
 
+    @classmethod
     def __get_funcstr(self, func):
         funcstring = str(getsourcelines(func)[0])
         func_str = funcstring.strip("['\\n']")
@@ -245,6 +246,7 @@ class Checker(object):
                     index, key, val, self.__get_funcstr(lambda_rule))
             ))
 
+    @classmethod
     def __type_check(self, index, exclist, key, val, type_rules):
         # if isinstance(type_rules, tuple):
         if type(val) not in type_rules:
@@ -263,7 +265,7 @@ class Checker(object):
         if isinstance(match_rule, str):
             if match_rule not in self._default_rules.keys():
                 exclist.append(RuleNotFound(
-                    "index: {}, not found parameter: {}'s rule: {}".format(key, rule)
+                    "index: {}, not found parameter: {}'s rule: {}".format(index, key, match_rule)
                 ))
                 return
             default_re = self._default_rules[match_rule]
