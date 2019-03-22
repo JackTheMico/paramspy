@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: paramspy
+Version: 1.0.0
+Summary: Parameter Checker For Pythoner
+Home-page: https://github.com/JackTheMico/paramspy
+Author: Jack Deng
+Author-email: dlwxxxdlw@gmail.com
+License: MIT Licence
+Description: make parameters check more pythonic
+Keywords: parameter,check
+Platform: UNKNOWN
