@@ -80,22 +80,23 @@ except CheckFailed as check_err:
          Last one is a default rule, there are three default rules, you can take a look by
          calling Checker.default_rules() or just take a look in checker.py.
          
-         Default Rules:
-         ```Python
-         {
-             'EMAIL': re.compile('^[a-z_0-9.-]{1,64}@([a-z0-9-]{1,200}.){1,5}[a-z]{1,6}$'),
-             'NUMBER': re.compile('^[-+]?[0-9]+$'),
-             'WORD': re.compile('[a-zA-Z-_\\d]+')
-         }
-         ``` 
       3. You may already noticed, yes you can write lambda to implement some custom check logic.
          Also, Regular Expression is supported, for example:
           ["phone", None, (int, str), re.compile('^(138|181)')],
          Checker will use '^(138|181)' as pattern and re.match method to check the "phone"
          parameter's value.
 
+### Default Rules for now:
+```Python
+    {
+    'EMAIL': re.compile('^[a-z_0-9.-]{1,64}@([a-z0-9-]{1,200}.){1,5}[a-z]{1,6}$'),
+    'NUMBER': re.compile('^[-+]?[0-9]+$'),
+    'WORD': re.compile('[a-zA-Z-_\\d]+')
+    }
+``` 
+
 ### So, that's basicially all of it.
-    Oh, One last thing, the Checker can check something like [{}, {}, {}] or a single dict object.
+### Oh, One last thing, the Checker can check something like [{}, {}, {}] or a single dict object.
     I'm still considering if there is need or not to make a Object Checker.
 
 ### By the way, if you found out thie README have many grammatical mistakes, that's because I'm a Chinese Programmer.
