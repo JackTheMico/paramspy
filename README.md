@@ -1,5 +1,7 @@
 ![alt text](./title.GIF "Title")
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 # Paramspy -- Parameters Checker for Pythoner
+
 
 ## How To Use
 ```Python
